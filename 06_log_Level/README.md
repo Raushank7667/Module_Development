@@ -1,24 +1,46 @@
-# Linux Kernel Module Development
+# 06_kernel_logging
 
-This repository contains Linux kernel modules developed on Debian
-(Raspberry Pi) for learning and BSP-level driver development.
+Here you can see how different log levels can be used with printk and how they are formated at the kernel log.
 
-## Modules
-- 02_hello: Better hello-world kernel module
+This example can be compiled and run on a Raspberry Pi or a normal x86 computer.
 
-## Build
-```bash
-make
-sudo insmod hello.ko
-sudo rmmod hello
-sudo dmesg
-sudo dmesg | tail
-sudo dmesg -w
+You can find the information also in the [Linux Kernel documentation](https://www.kernel.org/doc/html/latest/core-api/printk-basics.html)
 
+## printk Function
 
+Printk is used like this:
 
+~~~
+printk(KERN_INFO "Message: %s\n", arg);
+~~~
 
-pi@pi:~/Programming/kernel_modules/02_hello $ sudo modprobe hello
-modprobe: FATAL: Module hello not found in directory /lib/modules/6.12.62+rpt-rpi-v8
-pi@pi:~/Programming/kernel_modules/02_hello $ sudo modprobe industialio
-modprobe: FATAL: Module industialio not found in directory /lib/modules/6.12.62+rpt-rpi-v8
+KERN_INFO is the log level used for this line of the kernel logs
+
+## Kernel Log Levels
+
+The following log levels are available:
+
+|     Name     | String |                 Alias function                |
+|:------------:|:------:|:---------------------------------------------:|
+| KERN_EMERG   | “0”    | pr_emerg()                                    |
+| KERN_ALERT   | “1”    | pr_alert()                                    |
+| KERN_CRIT    | “2”    | pr_crit()                                     |
+| KERN_ERR     | “3”    | pr_err()                                      |
+| KERN_WARNING | “4”    | pr_warn()                                     |
+| KERN_NOTICE  | “5”    | pr_notice()                                   |
+| KERN_INFO    | “6”    | pr_info()                                     |
+| KERN_DEBUG   | “7”    | pr_debug() and pr_devel() if DEBUG is defined |
+| KERN_DEFAULT | “”     |                                               |
+| KERN_CONT    | “c”    | pr_cont()                                     |
+
+## Filtering for log levels
+
+You can filter for a specific loglevel with the -l option of dmesg:
+
+~~~
+# Only show Debug messages
+sudo dmesg -l 7
+
+# Only show critical messages
+sudo dmesg -l 2
+~~~
