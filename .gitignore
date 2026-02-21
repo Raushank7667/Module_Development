@@ -6,4 +6,8 @@
 .tmp_versions/
 Module.symvers
 modules.order
-
+# Vim swap files
+*.swp
+*.swo
+*.swn
+*.sw?
