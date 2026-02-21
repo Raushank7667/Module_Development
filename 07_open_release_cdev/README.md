@@ -1,46 +1,61 @@
-# 06_kernel_logging
+# 06_hello_cdev
 
-Here you can see how different log levels can be used with printk and how they are formated at the kernel log.
+A demonstration for how to implement the open and release function of a Character Device Files in a Linux Driver or Kernel Module
 
 This example can be compiled and run on a Raspberry Pi or a normal x86 computer.
 
-You can find the information also in the [Linux Kernel documentation](https://www.kernel.org/doc/html/latest/core-api/printk-basics.html)
+## Explaining the code
 
-## printk Function
+In the `struct file_operations fops` we can set callback functions for various syscalls, like `open`, `read`, `write`, `close`, ... For our character device we have overloaded the `open` function which will be called, when we call the `open` functions for the device file linked to the character device over the device number from userspace and the `release` function, which will be called when we call `close` from userspace.
 
-Printk is used like this:
-
-~~~
-printk(KERN_INFO "Message: %s\n", arg);
-~~~
-
-KERN_INFO is the log level used for this line of the kernel logs
-
-## Kernel Log Levels
-
-The following log levels are available:
-
-|     Name     | String |                 Alias function                |
-|:------------:|:------:|:---------------------------------------------:|
-| KERN_EMERG   | “0”    | pr_emerg()                                    |
-| KERN_ALERT   | “1”    | pr_alert()                                    |
-| KERN_CRIT    | “2”    | pr_crit()                                     |
-| KERN_ERR     | “3”    | pr_err()                                      |
-| KERN_WARNING | “4”    | pr_warn()                                     |
-| KERN_NOTICE  | “5”    | pr_notice()                                   |
-| KERN_INFO    | “6”    | pr_info()                                     |
-| KERN_DEBUG   | “7”    | pr_debug() and pr_devel() if DEBUG is defined |
-| KERN_DEFAULT | “”     |                                               |
-| KERN_CONT    | “c”    | pr_cont()                                     |
-
-## Filtering for log levels
-
-You can filter for a specific loglevel with the -l option of dmesg:
+Here are the prototypes of the callback functions we want to implement:
 
 ~~~
-# Only show Debug messages
-sudo dmesg -l 7
-
-# Only show critical messages
-sudo dmesg -l 2
+int my_open(struct inode *inode, struct file *filp);
+int my_release(struct inode *inode, struct file *filp);
 ~~~
+
+Both functions return 0 on success, else a negative error code. The arguments are also identical. Here is an explanation of the arguments and also some important fields:
+
+- `struct inode *inode`: Kernel representation of a file. We can get the Major and Minor Device numbers from it
+- `struct file *filp`: Represents the opened file. Important fields are:
+    - `f_mode`: File permissions, e.g. read, write, ...
+    - `f_ops`: Pointer to the file operations associated with this file
+    - `f_pos`: Current position in file (0 on open)
+    - `f_flags`: Flags set by the userspace `open` function, e.g. `O_RDONLY`, `O_RDWR`, ...
+
+The major and minor device number can be read out the `inode`with the function `imajor` and `iminor`.
+
+The file operations are bundled in the `fops` struct. 
+
+## Testing the code
+
+We need a small userspace application to test the driver. You can pass the file to open to the program. Compile it with gcc:
+
+
+~~~
+gcc test.c -o cdev_test
+~~~
+
+Load the Kernel Module, check for the device number and create some device files:
+
+~~~
+sudo insmod hello_cdev.ko
+sudo mknod /dev/hello0 c 236 0
+sudo mknod /dev/hello11 c 236 11
+~~~
+
+Now, lets run the test application:
+
+~~
+sudo ./cdev_test /dev/hello0
+~~
+
+You should see the prints in the kernel logs. The Minor Device Number should be zero. The `f_mode` and `f_flags` differ on every open, as we are using different flags.
+
+When using the test application with the other device file, the Minor Device Number should be 11 instead of 0.
+
+~~~
+sudo ./cdev_test /dev/hello11
+~~~
+
