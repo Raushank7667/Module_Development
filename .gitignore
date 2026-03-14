@@ -11,3 +11,4 @@ modules.order
 *.swo
 *.swn
 *.sw?
+*.out
