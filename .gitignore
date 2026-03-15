@@ -13,3 +13,4 @@ modules.order
 *.sw?
 *.out
 13_ioctl/testapp
+*.dtbo
