@@ -14,3 +14,17 @@ modules.order
 *.out
 13_ioctl/testapp
 *.dtbo
+
+# Ignore misc device test binaries/scripts
+21_misdev/echo
+21_misdev/hello_miscdev
+21_misdev/insmod
+21_misdev/testapp
+
+# General kernel build artifacts (recommended)
+*.ko
+*.o
+*.mod
+*.mod.c
+*.order
+*.symvers
