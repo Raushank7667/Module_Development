@@ -1,9 +1,6 @@
+obj-m += hello_miscdev.o
 
-obj-m+=hello_miscdev.o
-all: testapp
+all: 
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
 clean:
-	make -C /lib/modules/($(shell uname -r)/build M=$(PWD) clean
-
-testapp: test.c
-	gcc $< -o $@
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
