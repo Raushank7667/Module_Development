@@ -6,7 +6,7 @@ This example can be compiled and run on a Raspberry Pi. The driver should also w
 
 ## Hardware setup
 
-![LED and Button connected to Raspberry Pi](../03_gpioctrl/led_button_Steckplatine.png)
+![LED and Button connected to Raspberry Pi](https://github.com/Johannes4Linux/Linux_Driver_Tutorial/blob/798aaadb5697fffad00dfa55e39607a93086bd10/03_gpioctrl/led_button_Steckplatine.png)
 
 The LED is connected to GPIO21, the button to GPIO20.
 
